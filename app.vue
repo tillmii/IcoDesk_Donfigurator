@@ -23,9 +23,9 @@
     <main>
       <aside v-if="modules.length">
         <h2>Farben</h2>
-        <div v-if="config?.colors" v-for="color in config.colors">
-          <input v-model="color.hex" @change="drawModule()" type="color"/>
-          {{ color.name }}
+        <div v-if="config?.colors" v-for="(hex, name) in config.colors">
+          <input v-model="config.colors[name]" @change="drawModule()" type="color"/>
+          {{ name }}
         </div>
         <h2>Module</h2>
         <div class="flex-col module" @mouseover="tryPreview(module.name)" v-if="config?.modules.length>0"
@@ -496,7 +496,7 @@ const getOptions = (name: String) => {
   return modules.value.find((module: any) => module.name === name)?.config
 }
 
-const predefinedColors = ['#000000', '#ffffff', "#0000ff", "#ff0000"]
+const predefinedColors = { "background": "#000000", "foreground": "#ffffff", "accent": "#0000ff", "danger": "#ff0000" };
 
 const drawModule = () => {
   if (typeof window === 'undefined') return
@@ -525,16 +525,16 @@ const drawModule = () => {
       let hasChanged = false
 
       // for each predefined color
-      predefinedColors.forEach((color, index) => {
+      Object.entries(predefinedColors).forEach(([name, hex]) => {
 
         // should convert to
-        const newColor = config.value.colors[index].hex
+        const newColor = config.value.colors[name];
 
         // if pixel matches color
         if (!hasChanged &&
-            imgData.data[i] === parseInt(color.substring(1, 3), 16) &&
-            imgData.data[i + 1] === parseInt(color.substring(3, 5), 16) &&
-            imgData.data[i + 2] === parseInt(color.substring(5, 7), 16)) {
+            imgData.data[i] === parseInt(hex.substring(1, 3), 16) &&
+            imgData.data[i + 1] === parseInt(hex.substring(3, 5), 16) &&
+            imgData.data[i + 2] === parseInt(hex.substring(5, 7), 16)) {
 
           // replace with the new color
           imgData.data[i] = parseInt(newColor.substring(1, 3), 16)

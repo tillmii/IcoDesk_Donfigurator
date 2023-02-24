@@ -8,7 +8,7 @@ export default defineEventHandler((event: any) => {
     if (!fs.existsSync(configFile)) {
         return {
             "version": "1.0.0",
-            "colors": [{"name": "Background", "hex": "#000000"}, { "name": "Foreground", "hex": "#ffffff" }, {"name": "Accent", "hex": "#00ffff"}, {"name": "Danger", "hex": "#ff0000"}],
+            "colors": { "background": "#000000", "foreground": "#ffffff", "accent": "#00ffff", "danger": "#ff0000" },
             "modules": []
         }
     }
