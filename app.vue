@@ -57,8 +57,11 @@
               {{ option.name }}
 
               <input v-model="module.config[option.name]" v-if="option.type=='text'" type="text"/>
+
               <input v-model="module.config[option.name]" v-else-if="option.type=='number'" :step="option.step"
                      :min="option.min" :max="option.max" type="number"/>
+
+              <input v-model="module.config[option.name]" v-if="option.type=='color'" type="color"/>
 
               <select v-model="module.config[option.name]" v-if="option.type=='enum'">
                 <option disabled value="">Bitte wählen</option>
