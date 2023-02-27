@@ -23,6 +23,9 @@ export default defineEventHandler(async (event: any) => {
     // get the config
     const config = await readBody(event)
 
+    // remove _id from config
+    delete config._id
+
     // insert or update
     const result = await collection.updateOne({configId: configId}, {$set: config}, {upsert: true})
 
@@ -30,7 +33,7 @@ export default defineEventHandler(async (event: any) => {
     await client.close();
 
     // return the config
-    return config
+    return {status: 'ok'}
 
     /*
     const configFile = `server/configs/${event.context.params.id}.json`
