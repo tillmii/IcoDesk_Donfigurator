@@ -203,6 +203,8 @@ aside {
   background-image: url("/ui/bg3.jpg");
   background-size: cover;
   color: #f3f1e7;
+  padding-bottom: 1em;
+  overflow: auto;
 }
 
 #preview {
@@ -432,14 +434,14 @@ setInterval(() => {
 
 const edit = () => {
 
-  if(id.value == null)
+  if (id.value == null)
     return
 
   loadConfig()
   editMode.value = true
 
   // change url to include id
-  if(typeof history !== "undefined")
+  if (typeof history !== "undefined")
     history.pushState(null, "", `/uuid/${id.value}`)
 
   setTimeout(() => {
@@ -455,7 +457,7 @@ const home = () => {
   id.value = null
 
   // change url to include id
-  if(typeof history !== "undefined")
+  if (typeof history !== "undefined")
     history.pushState(null, "", "/")
 }
 
@@ -521,7 +523,7 @@ const getOptions = (name: String) => {
   return modules.value.find((module: any) => module.name === name)?.config
 }
 
-const predefinedColors = { "background": "#000000", "foreground": "#ffffff", "accent": "#0000ff", "danger": "#ff0000" };
+const predefinedColors = {"background": "#000000", "foreground": "#ffffff", "accent": "#0000ff", "danger": "#ff0000"};
 
 const drawModule = () => {
   if (typeof document === 'undefined') return
@@ -654,7 +656,7 @@ watch(modules, () => {
 
 const route = useRoute()
 // does the route.path begin with /uuid/ ? if so, get the uuid
-if(route.path.startsWith("/uuid/")) {
+if (route.path.startsWith("/uuid/")) {
   id.value = route.path.substring(6)
   edit()
 }
