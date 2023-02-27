@@ -11,6 +11,7 @@
     "nuxt": "^3.2.2"
   },
   "dependencies": {
+    "mongodb": "^5.1.0",
     "qrcode": "^1.5.1"
   }
 }
