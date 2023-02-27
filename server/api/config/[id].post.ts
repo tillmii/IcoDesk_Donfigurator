@@ -1,7 +1,38 @@
 import * as fs from "fs";
 
+// mongodb
+import mongodb from "mongodb";
+
 export default defineEventHandler(async (event: any) => {
 
+    // connect to mongodb
+    const MongoClient = mongodb.MongoClient;
+    const client = new MongoClient('mongodb://webapp:RrSHZ9Cc8vFUF8w9@cl2.najajan.de:27777/icodesk_configurator', {useUnifiedTopology: true});
+
+    await client.connect();
+
+    // get the database
+    const db = client.db('icodesk_configurator');
+
+    // get the collection
+    const collection = db.collection('configs');
+
+    // get the config id
+    const configId = event.context.params.id
+
+    // get the config
+    const config = await readBody(event)
+
+    // insert or update
+    const result = await collection.updateOne({configId: configId}, {$set: config}, {upsert: true})
+
+    // close the connection
+    await client.close();
+
+    // return the config
+    return config
+
+    /*
     const configFile = `server/configs/${event.context.params.id}.json`
 
     // get body
@@ -13,5 +44,7 @@ export default defineEventHandler(async (event: any) => {
 
     // return the config file
     return body
+
+     */
 
 })

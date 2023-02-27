@@ -1,1 +1,36 @@
-{"version":"1.0.0","colors":{"background":"#000000","foreground":"#ffffff","accent":"#00ffff","danger":"#ff0000"},"modules":[{"name":"Logo","version":"1.0.0","config":{"logoColor":"#ff00ff","animationSpeed":300}},{"name":"DateTime","version":"1.0.0","config":{"gmtOffsetSec":3600,"daylightOffsetSec":0}},{"name":"Weather","version":"1.0.0","config":{"city":"dresden","privateKey":"Get your key from https://openweathermap.org/","refreshTime":60000}}]}
+{
+  "version": "1.0.0",
+  "colors": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#00ffff",
+    "danger": "#ff0000"
+  },
+  "modules": [
+    {
+      "name": "Logo",
+      "version": "1.0.0",
+      "config": {
+        "logoColor": "#ff00ff",
+        "animationSpeed": 300
+      }
+    },
+    {
+      "name": "DateTime",
+      "version": "1.0.0",
+      "config": {
+        "gmtOffsetSec": 3600,
+        "daylightOffsetSec": 0
+      }
+    },
+    {
+      "name": "Weather",
+      "version": "1.0.0",
+      "config": {
+        "city": "dresden",
+        "privateKey": "Get your key from https://openweathermap.org/",
+        "refreshTime": 60000
+      }
+    }
+  ]
+}
