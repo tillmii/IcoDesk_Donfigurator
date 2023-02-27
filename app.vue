@@ -451,6 +451,9 @@ const home = () => {
 
   editMode.value = false
 
+  // reset id
+  id.value = null
+
   // change url to include id
   if(typeof history !== "undefined")
     history.pushState(null, "", "/")
