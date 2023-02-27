@@ -12,7 +12,7 @@
   <div v-else>
     <nav class="top">
       <button class="eightbit-btn eightbit-btn--proceed" style="filter:saturate(0) brightness(.9)"
-              @click="editMode=false">&lt; Zurück
+              @click="home()">&lt; Zurück
       </button>
       <h1>Geräte-ID: {{ id }}</h1>
       <button :class="{'eightbit-btn':true, 'eightbit-btn--proceed':unsavedChanges}" @click="storeConfig()">
@@ -119,12 +119,12 @@
 
 @font-face {
   font-family: 'vt323';
-  src: url('ui/vt323.ttf');
+  src: url('/ui/vt323.ttf');
 }
 
 .screen {
   background-color: #383838;
-  background: url("ui/bg6.jpg");
+  background: url("/ui/bg6.jpg");
   color: #fff;
   font-family: 'vt323';
   font-size: 1.5em;
@@ -180,7 +180,7 @@ input[type="color"] {
   border-bottom: 1px solid #0006;
   height: 50px;
   background: #3677b6;
-  background-image: url("ui/bg5.jpg");
+  background-image: url("/ui/bg5.jpg");
   color: white;
   padding: 0 1rem;
 }
@@ -200,7 +200,7 @@ aside {
   flex: 1;
   background: #333e47;
   border-right: 2px solid #0005;
-  background-image: url("ui/bg3.jpg");
+  background-image: url("/ui/bg3.jpg");
   background-size: cover;
   color: #f3f1e7;
 }
@@ -209,7 +209,7 @@ aside {
   flex: 4;
   height: 100%;
   background-color: #000;
-  background-image: url("ui/cube.jpg");
+  background-image: url("/ui/cube.jpg");
   background-size: auto 100%;
   background-repeat: no-repeat;
   background-position: center;
@@ -221,7 +221,7 @@ aside {
   filter: hue-rotate(226deg) saturate(3) brightness(1.5);
   z-index: 99;
   top: 0;
-  background-image: url("ui/cube_overlay.png");
+  background-image: url("/ui/cube_overlay.png");
   height: 100%;
   width: 100%;
   background-size: auto 100%;
@@ -429,12 +429,31 @@ setInterval(() => {
   underlineVisible.value = !underlineVisible.value
 }, 500)
 
+
 const edit = () => {
+
+  if(id.value == null)
+    return
+
   loadConfig()
   editMode.value = true
+
+  // change url to include id
+  if(typeof history !== "undefined")
+    history.pushState(null, "", `/uuid/${id.value}`)
+
   setTimeout(() => {
     drawModule()
   }, 100)
+}
+
+const home = () => {
+
+  editMode.value = false
+
+  // change url to include id
+  if(typeof history !== "undefined")
+    history.pushState(null, "", "/")
 }
 
 const loadConfig = async () => {
@@ -502,14 +521,11 @@ const getOptions = (name: String) => {
 const predefinedColors = { "background": "#000000", "foreground": "#ffffff", "accent": "#0000ff", "danger": "#ff0000" };
 
 const drawModule = () => {
-  if (typeof window === 'undefined') return
+  if (typeof document === 'undefined') return
 
   // get 2d context from canvas
   const ctx = document.getElementById("module")?.getContext("2d")
-  if (!ctx) {
-    console.error("Could not get 2d context from canvas")
-    return
-  }
+  if (!ctx) return
 
   // draw /view.jpg onto canvas
   const img = new Image()
@@ -569,19 +585,6 @@ const tryPreview = (moduleName) => {
 }
 
 const view = ref("/ui/view.png")
-
-// dev mode
-// id.value = '123'
-// edit()
-
-// if config.value.colors is an array, call drawModule
-/*
-setInterval(() => {
-  if (config.value?.colors) {
-    drawModule()
-  }
-}, 5000)
-*/
 
 setTimeout(() => {
   drawModule()
@@ -646,4 +649,10 @@ watch(modules, () => {
   drawModule()
 }, {deep: true})
 
+const route = useRoute()
+// does the route.path begin with /uuid/ ? if so, get the uuid
+if(route.path.startsWith("/uuid/")) {
+  id.value = route.path.substring(6)
+  edit()
+}
 </script>
