@@ -5,6 +5,7 @@ import {log} from "unenv/runtime/node/util";
 export default defineEventHandler((event: any) => {
 
     let uuid = crypto.randomUUID();
+
     let code = qrcode.create("icode.sk/uuid/" + uuid);
     let size = code.modules.size;
 
@@ -24,7 +25,5 @@ export default defineEventHandler((event: any) => {
         }
     }
 
-    // console.log(hexString);
-
-    return { "uuid":  uuid, "qrCode": { "data": hexString, "size": size } };
+    return { "uuid":  uuid, "qrCode": { "data": Object.values(arr), "size": size } };
 })
