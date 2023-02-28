@@ -32,9 +32,7 @@ export default defineEventHandler(async (event: any) => {
         return {
             "version": "1.0.0",
             "colors": {"background": "#000000", "foreground": "#ffffff", "accent": "#00ffff", "danger": "#ff0000"},
-            "repositories": [
-                "https://github.com/ziegenhagel/IcoMod_Calendar/",
-            ],
+            "repositories": [],
             "modules": []
         }
     }
