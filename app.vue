@@ -11,7 +11,7 @@
   </div>
   <div v-else>
     <nav class="top">
-      <button class="eightbit-btn eightbit-btn--proceed" style="filter:saturate(0) brightness(.9)"
+      <button class="eightbit-btn eightbit-btn--gray" style=""
               @click="home()">&lt; Zurück
       </button>
       <h1>Geräte-ID: {{ id }}</h1>
@@ -28,10 +28,11 @@
           {{ name }}
         </div>
         <h2>Module</h2>
-        <div class="flex-col module" @mouseover="tryPreview(module.name)" v-if="config?.modules.length>0"
+        <div :class="{'flex-col':true, module:true,unsafe:module.unsafe}" @mouseover="tryPreview(module.name)"
+             v-if="config?.modules.length>0"
              v-for="(module,index) in config.modules">
-          <div class="flex">
-            <div>{{ index }}-{{ module.name }}</div>
+          <div :class="{flex:true}">
+            <div>{{ module.name }}</div>
             <div class="icons">
               <svg @click="moveModule(index,false)" :class="{disabled:index==0}" xmlns="http://www.w3.org/2000/svg"
                    fill="none" viewBox="0 0 24 24"
@@ -80,7 +81,8 @@
         <div v-else>Keine Module aktiviert.</div>
 
         <h2>Bibliothek</h2>
-        <div class="flex" @mouseover="preview(module.view)" v-if="modules" v-for="(module,index) in modules">
+        <div :class="{unsafe:module.unsafe,flex:true}" @mouseover="preview(module.view)" v-if="modules"
+             v-for="(module,index) in modules">
           <div>{{ module.name }}</div>
           <div class="icons">
             <svg @click="appendModule(index)" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -91,6 +93,9 @@
           </div>
         </div>
         <div v-else>Keine Module gefunden.</div>
+
+        <div style="height:10px"></div>
+        <button @click="addRepository()" class="eightbit-btn eightbit-btn--gray">Repositories hinzufügen</button>
 
       </aside>
       <aside v-else>
@@ -106,6 +111,7 @@
 </template>
 
 <style>
+
 .module {
   background: #0005;
   padding: 6px 4px;
@@ -315,6 +321,10 @@ button {
   border-bottom: 4px black solid;
 }
 
+.eightbit-btn--gray {
+  filter: saturate(0) brightness(.9)
+}
+
 .eightbit-btn:after {
   left: -4px;
   top: 0;
@@ -413,6 +423,22 @@ select, input {
   box-sizing: border-box;
   border-width: 1px;
 }
+
+.unsafe {
+  color: #ffffff;
+  background: url("/ui/unsafe.jpg");
+  background-size: 30px;
+}
+
+.unsafe * {
+  color: white;
+}
+
+.unsafe svg, .unsafe input {
+  background: black;
+  border-color: #fff5;
+  margin-bottom: 2px;
+}
 </style>
 
 <script lang="ts" setup>
@@ -464,6 +490,41 @@ const home = () => {
 const loadConfig = async () => {
   const response = await fetch(`/api/config/${id.value}`)
   config.value = await response.json()
+
+  // load additional modules
+  const additionalModules = config.value.repositories
+  for (const repo of additionalModules) {
+    loadModuleFromRepo(repo, true)
+  }
+
+}
+
+const addRepository = () => {
+  const url = prompt("URL des Repos?", "https://github.com/tillmii/IcoMod_Logo/");
+
+  // url muss im Format https://github.com/tillmii/IcoMod_Logo/ sein
+
+  const rules = [
+    {
+      "description": "Muss am Ende ein / haben",
+      "rule": (url: string) => url.endsWith("/")
+    },
+    {
+      "description": "Muss mit https://github.com/ anfangen",
+      "rule": (url: string) => url.startsWith("https://github.com/")
+    }
+  ]
+
+  for (const rule of rules) {
+    if (!rule.rule(url)) {
+      alert("URL ist ungültig. " + rule.description)
+      return
+    }
+  }
+
+  config.value.repositories.push(url)
+  loadModuleFromRepo(url, true)
+
 }
 
 const storeConfig = async () => {
@@ -509,6 +570,9 @@ const appendModule = (index: any) => {
     version: module.version,
     config: {}
   }
+
+  if (module.unsafe)
+    newModule.unsafe = true
 
   // add config
   for (const key in module.config) {
@@ -609,30 +673,8 @@ const loadModules = async () => {
         // for each repo, get the IcoMod.json
         data.forEach(async (repo: string) => {
 
-          // get the IcoMod.json
-          // origin url is https://github.com/tillmii/IcoMod_Weather/ to https://raw.githubusercontent.com/tillmii/IcoMod_Weather/main/WebInfo/IcoMod.json
-          const url = repo.replace('github.com', 'raw.githubusercontent.com') + 'main/WebInfo/IcoMod.json'
-
-          // just log the url
-          console.log("getting info from repo", url)
-
-          await fetch(url)
-              .then(response => response.json())
-              .then(data => {
-
-                // log the data
-                console.log("got data", data)
-
-                //https://github.com/tillmii/IcoMod_Logo/blob/main/WebInfo/Views/View01.png
-                data.view = repo.replace('github.com', 'raw.githubusercontent.com') + 'main/WebInfo/Views/View01.png'
-
-                // add the repo to the list of known modules
-                modules.value.push(data)
-
-              })
-              .catch(err => {
-                console.log(err)
-              })
+          // load the module from the repo
+          await loadModuleFromRepo(repo)
 
         })
       })
@@ -642,6 +684,39 @@ const loadModules = async () => {
 
 }
 loadModules()
+
+const loadModuleFromRepo = async (repoUrl: String, unsafe: boolean = false) => {
+
+  // get the IcoMod.json
+  // origin url is https://github.com/tillmii/IcoMod_Weather/ to https://raw.githubusercontent.com/tillmii/IcoMod_Weather/main/WebInfo/IcoMod.json
+  const url = repoUrl.replace('github.com', 'raw.githubusercontent.com') + 'main/WebInfo/IcoMod.json'
+
+  // just log the url
+  console.log("getting info from repo", url)
+
+  await fetch(url)
+      .then(response => response.json())
+      .then(data => {
+
+        // log the data
+        console.log("got data", data)
+
+        //https://github.com/tillmii/IcoMod_Logo/blob/main/WebInfo/Views/View01.png
+        data.view = repoUrl.replace('github.com', 'raw.githubusercontent.com') + 'main/WebInfo/Views/View01.png'
+
+        data.unsafe = unsafe
+
+        if (data.name) {
+          // add the repo to the list of known modules
+          modules.value.push(data)
+        }
+
+      })
+      .catch(err => {
+        console.log(err)
+      })
+
+}
 
 const unsavedChanges = ref(false)
 

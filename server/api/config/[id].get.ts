@@ -25,13 +25,16 @@ export default defineEventHandler(async (event: any) => {
     // close the connection
     await client.close();
 
-    console.log("RESULT",result)
+    console.log("RESULT", result)
 
     // if no result was found
     if (!result) {
         return {
             "version": "1.0.0",
-            "colors": { "background": "#000000", "foreground": "#ffffff", "accent": "#00ffff", "danger": "#ff0000" },
+            "colors": {"background": "#000000", "foreground": "#ffffff", "accent": "#00ffff", "danger": "#ff0000"},
+            "repositories": [
+                "https://github.com/ziegenhagel/IcoMod_Calendar/",
+            ],
             "modules": []
         }
     }
