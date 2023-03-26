@@ -30,7 +30,7 @@ export default defineEventHandler(async (event: any) => {
     // if no result was found
     if (!result) {
         return {
-            "version": "1.0.0",
+            "version": 1,
             "colors": {"background": "#000000", "foreground": "#ffffff", "accent": "#00ffff", "danger": "#ff0000"},
             "repositories": [],
             "modules": []

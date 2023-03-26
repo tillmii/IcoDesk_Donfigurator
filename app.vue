@@ -489,7 +489,8 @@ const home = () => {
 
 const loadConfig = async () => {
   const response = await fetch(`/api/config/${id.value}`)
-  config.value = await response.json()
+  const json = await response.json();
+  config.value = migrateConfig(json)
 
   // load additional modules
   const additionalModules = config.value.repositories
@@ -497,6 +498,23 @@ const loadConfig = async () => {
     loadModuleFromRepo(repo, true)
   }
 
+}
+
+const migrateConfig = (config: any) => {
+
+  console.log("migrating config", config)
+
+  // if no version is set, set it to 1
+  if (config.version == null || config.version == "1.0.0")
+    config.version = 1
+
+  // migrate old config
+  if (config.version == 1) {
+    config.version = 2
+    config.repositories = []
+  }
+
+  return config
 }
 
 const addRepository = () => {
@@ -736,3 +754,4 @@ if (route.path.startsWith("/uuid/")) {
   edit()
 }
 </script>
+
