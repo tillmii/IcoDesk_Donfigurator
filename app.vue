@@ -57,19 +57,41 @@
             <div class="flex">
               {{ option.name }}
 
-              <input v-model="module.config[option.name]" v-if="option.type=='text'" type="text"/>
+              <div v-if="option.type == 'array'">
+                <div v-for="(value, index) in module.config[option.name]" style="display:flex">
+                  <input style="flex:1" v-model="module.config[option.name][index]" :type="option.of"/>
+                  <svg style="flex:0;min-width:20px" @click="module.config[option.name].splice(index,1)"
+                       xmlns="http://www.w3.org/2000/svg"
+                       fill="none" viewBox="0 0 24 24"
+                       stroke-width="1.5"
+                       stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </div>
+                <svg style="margin-left:auto;flex:0;min-width:20px" @click="module.config[option.name].push('')"
+                     xmlns="http://www.w3.org/2000/svg" fill="none"
+                     viewBox="0 0 24 24"
+                     stroke-width="1.5"
+                     stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+              </div>
+
+              <input v-model="module.config[option.name]" v-else-if="option.type=='text'" type="text"/>
 
               <input v-model="module.config[option.name]" v-else-if="option.type=='number'" :step="option.step"
                      :min="option.min" :max="option.max" type="number"/>
 
-              <input v-model="module.config[option.name]" v-if="option.type=='color'" type="color"/>
+              <input v-model="module.config[option.name]" v-else-if="option.type=='color'" type="color"/>
 
-              <select v-model="module.config[option.name]" v-if="option.type=='enum'">
+              <select v-model="module.config[option.name]" v-else-if="option.type=='enum'">
                 <option disabled value="">Bitte wählen</option>
                 <option v-for="value in option.options" :value="value">{{ value }}</option>
               </select>
 
-              <select v-model="module.config[option.name]" v-if="option.type=='boolean'">
+              <select v-model="module.config[option.name]" v-else-if="option.type=='boolean'">
                 <option disabled value="">Bitte wählen</option>
                 <option :value="true">true</option>
                 <option :value="false">false</option>
